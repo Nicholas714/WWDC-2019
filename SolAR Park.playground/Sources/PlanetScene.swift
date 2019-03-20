@@ -44,9 +44,9 @@ public class PlanetView: ARSCNView, ARSCNViewDelegate, UIGestureRecognizerDelega
         planetScene.setup(self)
         
         pastFrame = planetView.frame
-
+        
         delegate = self
-    
+        
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapGesture))
         addGestureRecognizer(tap)
         
@@ -135,7 +135,7 @@ public class PlanetView: ARSCNView, ARSCNViewDelegate, UIGestureRecognizerDelega
                 if let first = arHit.first {
                     planetScene.createSun()
                     planetNode?.position = SCNVector3(x: first.worldTransform.columns.3.x, y: first.worldTransform.columns.3.y, z: first.worldTransform.columns.3.z)
-
+                    
                 }
             }
         }
@@ -252,11 +252,11 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
         
         floorNode.removeFromParentNode()
         sceneView.floorNode = nil
-                
+        
         planetView.controlView.enableControls()
     }
     
-    func createPlanet() {        
+    func createPlanet() {
         guard let position = sceneView.pointOfView?.position, let system = planetSystem else {
             return
         }
@@ -273,7 +273,7 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
         planetNode.position = orbitNode.convertPosition(planetPosition, from: nil)
         
         addNode(planetNode, to: orbitNode)
-
+        
         planetNode.orbitNode = orbitNode
         planetNode.applyActions()
         planetSystem?.planets.append(planetNode)
@@ -293,7 +293,7 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
         addNode(orbitNode, to: planetNode)
         moonNode.position = SCNVector3(x: 0, y: 0, z: 0.1)
         orbitNode.addChildNode(moonNode)
-
+        
         planetNode.applyActions()
         planetSystem?.planets.append(moonNode)
     }
@@ -347,4 +347,12 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
             }
         }
     }
+}
+
+public extension SCNVector3 {
+    
+    func dis(_ vector: SCNVector3) -> CGFloat {
+        return CGFloat(sqrt(pow(vector.x - x, 2) + pow(vector.z - z, 2)))
+    }
+    
 }

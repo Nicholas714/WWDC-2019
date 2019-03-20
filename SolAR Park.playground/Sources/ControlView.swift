@@ -20,7 +20,7 @@ class ControlView {
         }
         return false
     }
-
+    
     // current selected planet/sun/moon, on change update UI to show only needed views
     var planetNode: PlanetNode? {
         didSet {
@@ -49,20 +49,20 @@ class ControlView {
     
     /*
      On Startup:
-       - direction view saying to click screen
+     - direction view saying to click screen
      
      On Create Sun/deselect planet:
-       - direction view saying to add planets
-       - system slider view
-       - action view
+     - direction view saying to add planets
+     - system slider view
+     - action view
      
      On select Planet/Moon/Sun:
-       - direction saying to change controls
-       - planet slider view
-       - formula view
-       - action view
+     - direction saying to change controls
+     - planet slider view
+     - formula view
+     - action view
      
-    */
+     */
     
     init() {
         systemSliderView = SystemSliderView()
@@ -135,7 +135,7 @@ class DirectionView: UIView {
         .placeMoon: "Tap a planet, then + to add a moon",
         .done: "WWDC19"
     ]
-
+    
     init() {
         super.init(frame: CGRect(x: 0, y: 0, width: 300, height: 40))
         
@@ -223,7 +223,7 @@ class FormulaCell: UITableViewCell {
         addSubview(formulaNameLabel)
         addSubview(formulaAnswerLabel)
     }
-
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
@@ -298,7 +298,7 @@ class FormulaView: UIView, UITableViewDelegate, UITableViewDataSource {
             return cell
         }
         
-        return cell 
+        return cell
     }
     
     func reloadEquations() {
@@ -334,7 +334,7 @@ class PlanetSliderView: UIView {
         addBlur()
         
         massText = UILabel(frame: CGRect(x: 16, y: 16, width: 284, height: 24))
-
+        
         massText.text = "Mass"
         massText.textColor = .white
         addSubview(massText)
@@ -593,7 +593,7 @@ class ActionView: UIView {
         addButton.tintColor = .white
         addButton.frame = CGRect(x: 0, y: 8, width: actionViewFrame.width, height: addButton.frame.height)
         addSubview(addButton)
-
+        
         playButton = UIButton(frame: CGRect(x: 8, y: addButton.frame.maxY + 8, width: 24, height: 24))
         playButton.tintColor = .white
         playButton.setImage(UIImage(named: "pause.png"), for: .normal)

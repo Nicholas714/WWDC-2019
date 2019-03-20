@@ -15,7 +15,7 @@ public class PlanetNode: SCNNode {
         } else {
             load(material: PlanetMaterial.nextPlanetTexture())
         }
-
+        
         applyActions()
     }
     

@@ -14,8 +14,8 @@ public class Introduction {
     var introSKScene: IntroSKScene!
     
     public init() {
-//         TODO: make start()
-//        loadAR()
+        //         TODO: make start()
+        //        loadAR()
         start()
     }
     
@@ -32,7 +32,7 @@ public class Introduction {
         let ar = ARSCNView(frame: CGRect.zero)
         ar.session.run(ARWorldTrackingConfiguration())
         PlaygroundPage.current.liveView = ar
-            
+        
         sceneView = SCNView(frame: CGRect(x: 0, y: 0, width: 500, height: 500))
         PlaygroundPage.current.liveView = sceneView
         
@@ -84,7 +84,7 @@ public class Introduction {
         fieldNode.physicsField = field
         
         let wwdcText = SCNText(string: "", extrusionDepth: 2)
-        wwdcText.firstMaterial?.emission.contents = UIColor.white 
+        wwdcText.firstMaterial?.emission.contents = UIColor.white
         
         wwdcText.flatness = 0.3
         wwdcNode = SCNNode(geometry: wwdcText)
@@ -92,12 +92,12 @@ public class Introduction {
         wwdcNode.scale = SCNVector3Make(5, 5, 0)
         wwdcNode.opacity = 0.0
         
-//        let wwdcText = SCNText(string: "WWDC19", extrusionDepth: 2)
-//        wwdcText.flatness = 0.3
-//        wwdcNode = SCNNode(geometry: wwdcText)
-//        wwdcNode.position = SCNVector3(x: -100, y: -20, z: 60)
-//        wwdcNode.scale = SCNVector3Make(3, 3, 0)
-//        wwdcNode.opacity = 0.0
+        //        let wwdcText = SCNText(string: "WWDC19", extrusionDepth: 2)
+        //        wwdcText.flatness = 0.3
+        //        wwdcNode = SCNNode(geometry: wwdcText)
+        //        wwdcNode.position = SCNVector3(x: -100, y: -20, z: 60)
+        //        wwdcNode.scale = SCNVector3Make(3, 3, 0)
+        //        wwdcNode.opacity = 0.0
         
         Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { (timer) in
             self.wwdcNode.runAction(SCNAction.fadeIn(duration: 10))
@@ -113,7 +113,7 @@ public class Introduction {
         }
         
         scene.rootNode.addChildNode(wwdcNode)
-
+        
     }
     
     func moveCamera() {
@@ -189,7 +189,7 @@ public class Introduction {
             addChild(startLabel)
             
             updatePositions()
-
+            
         }
         
         func blackFadeOut() {
@@ -238,7 +238,7 @@ public class Introduction {
         }
         
     }
-
+    
     
 }
 

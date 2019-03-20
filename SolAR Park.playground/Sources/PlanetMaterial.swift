@@ -13,28 +13,28 @@ public class PlanetMaterial {
     public static func loadTextures() {
         func materialForName(_ name: String) -> SCNMaterial {
             let material = SCNMaterial()
-
+            
             material.lightingModel = .physicallyBased
             material.diffuse.contents = UIImage(named: name)
             material.isDoubleSided = false
-
+            
             return material
         }
-
+        
         planets = (1...7).map {
             return materialForName("planet\($0).jpg")
         }
-
+        
         moons = (1...2).map {
             return materialForName("moon\($0).jpg")
         }
-
+        
         centerPlanet = materialForName("sun.jpg")
         
         // kinda looks like stars
         floor = materialForName("planet7.jpg")
     }
-        
+    
     static func nextPlanetTexture() -> SCNMaterial {
         let material = PlanetMaterial.planets[planetIndex]
         
