@@ -27,6 +27,10 @@ extension Planet {
     var g: CGFloat {
         return (6.674e-11 * actualMass) / pow(actualRadius, 2)
     }
+    
+    var humanWeight: CGFloat {
+        return 68 * g * (1 / 4.4482216)
+    }
 }
 
 struct StaticPlanet: Planet {
@@ -60,10 +64,6 @@ struct OrbitingPlanet: Planet {
     var actualRevolutionPeriod: CGFloat {
         let period = 2 * CGFloat.pi * sqrt(pow(actualDistance, 3) / (target.planet.actualMass * 6.67e-11))
         return period * (1 / (3600 * 24))
-    }
-    
-    var humanWeight: CGFloat {
-        return 68 * g * (1 / 4.4482216)
     }
     
     var forceOfGravity: CGFloat {

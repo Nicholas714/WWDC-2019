@@ -1,4 +1,5 @@
 import ARKit
+import PlaygroundSupport
 
 public enum SelectionState {
     
@@ -16,8 +17,9 @@ public class PlanetView: ARSCNView, ARSCNViewDelegate, UIGestureRecognizerDelega
     var planetNode: PlanetNode?
     var floorNode: SCNNode?
     var highlightedNode: SCNNode?
+    var pastFrame: CGRect!
     
-    var informationView: InformationView!
+    var controlView: ControlView!
     
     var state: SelectionState {
         if floorNode != nil {
@@ -35,17 +37,16 @@ public class PlanetView: ARSCNView, ARSCNViewDelegate, UIGestureRecognizerDelega
     }
     
     public func setup() {
-        
-        let actionView = ActionView()
-        addSubview(actionView)
-        informationView = InformationView(actionView)
-        addSubview(informationView)
+        controlView = ControlView()
         
         planetScene = PlanetScene()
         scene = planetScene
         planetScene.setup(self)
-        delegate = self
         
+        pastFrame = planetView.frame
+
+        delegate = self
+    
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapGesture))
         addGestureRecognizer(tap)
         
@@ -55,6 +56,7 @@ public class PlanetView: ARSCNView, ARSCNViewDelegate, UIGestureRecognizerDelega
         configuration.planeDetection = .horizontal
         
         session.run(configuration)
+        
     }
     
     public func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
@@ -85,6 +87,10 @@ public class PlanetView: ARSCNView, ARSCNViewDelegate, UIGestureRecognizerDelega
     
     public func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         scene.lightingEnvironment.intensity = 1
+        if let newFrame = (PlaygroundPage.current.liveView as? UIView)?.frame, newFrame != pastFrame {
+            pastFrame = newFrame
+            planetView.controlView.updateView(with: newFrame)
+        }
     }
     
     @objc func tapGesture(_ gesture: UITapGestureRecognizer) {
@@ -100,7 +106,7 @@ public class PlanetView: ARSCNView, ARSCNViewDelegate, UIGestureRecognizerDelega
             let past = highlightedNode?.geometry?.firstMaterial
             if let p = past {
                 
-                unselect()
+                unselect(shouldFadeOut: false, funct: nil)
                 
                 if let node = hit.first?.node {
                     
@@ -136,7 +142,9 @@ public class PlanetView: ARSCNView, ARSCNViewDelegate, UIGestureRecognizerDelega
     }
     
     func select(node: SCNNode) {
-        informationView.planetNode = node as? PlanetNode
+        if let node = node as? PlanetNode {
+            controlView.planetNode = node
+        }
         
         highlightedNode = node
         
@@ -148,8 +156,10 @@ public class PlanetView: ARSCNView, ARSCNViewDelegate, UIGestureRecognizerDelega
         SCNTransaction.commit()
     }
     
-    func unselect(funct: (() -> ())? = nil) {
-        informationView.planetNode = nil
+    func unselect(shouldFadeOut: Bool = true, funct: (() -> ())? = nil) {
+        if controlView.planetNode != nil && shouldFadeOut {
+            controlView.planetNode = nil
+        }
         
         if let mat = highlightedNode?.geometry?.firstMaterial {
             
@@ -231,6 +241,9 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
             return
         }
         
+        // created sun
+        planetView.controlView.directionView.nextDirection(shouldBe: .placeFloor)
+        
         sceneView.planetNode = PlanetNode(mass: 1.989e30, radius: 0.15, rotationPeriod: 10)
         sceneView.planetNode!.position = floorNode.position
         addNode(sceneView.planetNode!)
@@ -240,13 +253,16 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
         floorNode.removeFromParentNode()
         sceneView.floorNode = nil
                 
-        planetView.informationView.enableControls()
+        planetView.controlView.enableControls()
     }
     
     func createPlanet() {        
         guard let position = sceneView.pointOfView?.position, let system = planetSystem else {
             return
         }
+        
+        // created planet
+        planetView.controlView.directionView.nextDirection(shouldBe: .placePlanet)
         
         let planetPosition = SCNVector3(x: position.x, y: system.centerPlanet.position.y, z: position.z)
         let distance = system.centerPlanet.position.dis(planetPosition)
@@ -268,15 +284,16 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
             return
         }
         
+        planetView.controlView.directionView.nextDirection(shouldBe: .placeMoon)
+        
         let distance: CGFloat = 0.1
-        let moonNode = PlanetNode(distance: distance, orbiting: orbitPlanet, radius: 0.005, mass: 7.34767e22, rotationPeriod: 30, eccentricity: distance)
+        let moonNode = PlanetNode(distance: distance, orbiting: orbitPlanet, radius: 0.005, mass: 7.34767e22, rotationPeriod: 30, eccentricity: distance, isMoon: true)
         let orbitNode = SCNNode()
         
         addNode(orbitNode, to: planetNode)
         moonNode.position = SCNVector3(x: 0, y: 0, z: 0.1)
         orbitNode.addChildNode(moonNode)
 
-        planetNode.orbitNode = orbitNode
         planetNode.applyActions()
         planetSystem?.planets.append(moonNode)
     }
@@ -291,26 +308,19 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
     
     func createFloor(anchor: ARPlaneAnchor) -> SCNNode? {
         if sceneView.planetNode == nil {
-//            let floor = SCNPlane(width: 0.2, height: 0.2)
-//            floor.cornerRadius = (floor.width / 2) * 0.5
-//
-//            let floorNode = SCNNode(geometry: floor)
-//            floorNode.name = "floor"
-//            floorNode.transform = SCNMatrix4MakeRotation(-Float.pi / 2, 1, 0, 0)
-//            sceneView.floorNode = floorNode
-//            return floorNode
             
-            let sphere = SCNSphere(radius: 0.15)
-            sphere.firstMaterial?.diffuse.contents = UIColor.gray
-            sphere.segmentCount = 72
+            // found flat surface, move to tap to place sun
+            planetView.controlView.directionView.nextDirection(shouldBe: .moveAround)
             
-            let sunNode = SCNNode(geometry: sphere)
-            sunNode.name = "floor"
-            sceneView.floorNode = sunNode
-            sunNode.opacity = 0.3
-            sunNode.position = SCNVector3(anchor.center.x, anchor.center.y, anchor.center.z)
+            let floor = SCNPlane(width: CGFloat(anchor.extent.x), height: CGFloat(anchor.extent.z))
+            floor.cornerRadius = (floor.width / 2) * 0.5
+            floor.materials = [PlanetMaterial.floor]
             
-            return sunNode
+            let floorNode = SCNNode(geometry: floor)
+            floorNode.name = "floor"
+            floorNode.transform = SCNMatrix4MakeRotation(-Float.pi / 2, 1, 0, 0)
+            sceneView.floorNode = floorNode
+            return floorNode
         }
         
         return nil

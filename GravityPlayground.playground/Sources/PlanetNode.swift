@@ -5,12 +5,17 @@ public class PlanetNode: SCNNode {
     var planet: Planet
     var orbitNode: SCNNode?
     
-    init(distance: CGFloat, orbiting: PlanetNode, radius: CGFloat, mass: CGFloat, rotationPeriod: CGFloat, eccentricity: CGFloat) {
+    init(distance: CGFloat, orbiting: PlanetNode, radius: CGFloat, mass: CGFloat, rotationPeriod: CGFloat, eccentricity: CGFloat, isMoon: Bool = false) {
         planet = OrbitingPlanet(target: orbiting, mass: mass, radius: radius, distance: distance, rotationPeriod: rotationPeriod, eccentricity: eccentricity)
         
         super.init()
         
-        load(material: PlanetMaterial.nextPlanetTexture())
+        if isMoon {
+            load(material: PlanetMaterial.nextMoonTexture())
+        } else {
+            load(material: PlanetMaterial.nextPlanetTexture())
+        }
+
         applyActions()
     }
     

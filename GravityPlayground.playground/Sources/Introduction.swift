@@ -14,15 +14,16 @@ public class Introduction {
     var introSKScene: IntroSKScene!
     
     public init() {
-        loadAR()
-//        start()
+//         TODO: make start()
+//        loadAR()
+        start()
     }
     
     func loadAR() {
         PlanetMaterial.loadTextures()
         planetView = PlanetView(frame: CGRect(x: 0, y: 0, width: 800, height: 800))
         PlaygroundPage.current.liveView = planetView
-
+        
         planetView.setup()
     }
     
@@ -82,12 +83,21 @@ public class Introduction {
         fieldNode = SCNNode()
         fieldNode.physicsField = field
         
-        let wwdcText = SCNText(string: "WWDC19", extrusionDepth: 2)
+        let wwdcText = SCNText(string: "", extrusionDepth: 2)
+        wwdcText.firstMaterial?.emission.contents = UIColor.white 
+        
         wwdcText.flatness = 0.3
         wwdcNode = SCNNode(geometry: wwdcText)
-        wwdcNode.position = SCNVector3(x: -90, y: -20, z: 100)
-        wwdcNode.scale = SCNVector3Make(3, 3, 0)
+        wwdcNode.position = SCNVector3(x: -27, y: -35, z: 100)
+        wwdcNode.scale = SCNVector3Make(5, 5, 0)
         wwdcNode.opacity = 0.0
+        
+//        let wwdcText = SCNText(string: "WWDC19", extrusionDepth: 2)
+//        wwdcText.flatness = 0.3
+//        wwdcNode = SCNNode(geometry: wwdcText)
+//        wwdcNode.position = SCNVector3(x: -100, y: -20, z: 60)
+//        wwdcNode.scale = SCNVector3Make(3, 3, 0)
+//        wwdcNode.opacity = 0.0
         
         Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { (timer) in
             self.wwdcNode.runAction(SCNAction.fadeIn(duration: 10))
@@ -98,6 +108,7 @@ public class Introduction {
         
         Timer.scheduledTimer(withTimeInterval: 15, repeats: false) { (timer) in
             self.introSKScene.startLabel.show()
+            self.introSKScene.startBackground.show()
             self.introSKScene.isAnimationFinished = true
         }
         
@@ -138,7 +149,6 @@ public class Introduction {
                 self.introSKScene.blackFadeOut()
                 
                 Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { (t) in
-                    // TODO: transition color
                     self.loadAR()
                 })
             }
@@ -149,27 +159,37 @@ public class Introduction {
         
         let intro: Introduction
         let startLabel: SKLabelNode
+        var startBackground: SKShapeNode!
         
         init(intro: Introduction) {
             self.intro = intro
-            self.startLabel = SKLabelNode(text: "Tap anywhere when the iPad Pro is in fullscreen and you are ready.")
+            self.startLabel = SKLabelNode(text: "Tap anywhere when the iPad is in fullscreen and you are ready.")
             
             super.init(size: intro.sceneView.frame.size)
             
-            let infoFont = UIFont.boldSystemFont(ofSize: 16.0).fontName
+            let infoFont = UIFont.boldSystemFont(ofSize: 40.0).fontName
             
             startLabel.verticalAlignmentMode = .center
             startLabel.horizontalAlignmentMode = .center
             
             scaleMode = .aspectFit
             
-            startLabel.fontSize = 12
+            self.startBackground = SKShapeNode(rect: CGRect(origin: CGPoint.zero, size: CGSize(width: 1000, height: startLabel.frame.height)), cornerRadius: 1.0)
+            
+            startBackground.fillColor = UIColor.black
+            startBackground.strokeColor = UIColor.black
+            startBackground.alpha = 0.0
+            
+            addChild(startBackground)
+            
+            startLabel.fontSize = 14
             startLabel.alpha = 0
             startLabel.fontName = infoFont
             
             addChild(startLabel)
-
+            
             updatePositions()
+
         }
         
         func blackFadeOut() {
@@ -178,6 +198,7 @@ public class Introduction {
             background.strokeColor = UIColor.black
             background.alpha = 0.0
             background.zPosition = 5
+            startBackground.run(SKAction.fadeOut(withDuration: 0.2))
             addChild(background)
             background.run(SKAction.fadeIn(withDuration: 2))
         }
@@ -192,13 +213,15 @@ public class Introduction {
             
             if let _ = touches.first, !isStarted {
                 startLabel.fade()
+                startBackground.fade()
                 self.intro.moveCamera()
                 isStarted = true
             }
         }
         
         func updatePositions() {
-            startLabel.position = CGPoint(x: frame.midX, y: frame.minX + 2.5 + startLabel.frame.height)
+            startLabel.position = CGPoint(x: frame.midX, y: frame.midY - 38 - startBackground.frame.height / 2)
+            startBackground.position = CGPoint(x: frame.midX - startBackground.frame.width / 2, y: frame.midY - startBackground.frame.height - 35)
         }
         
         override func update(_ currentTime: TimeInterval) {
@@ -238,5 +261,17 @@ extension SKLabelNode {
             self.fade()
         })
     }
+}
+
+extension SKShapeNode {
+    
+    func fade() {
+        run(SKAction.fadeOut(withDuration: 0.5))
+    }
+    
+    func show() {
+        run(SKAction.fadeIn(withDuration: 0.5))
+    }
+    
 }
 

@@ -25,23 +25,14 @@ public class PlanetMaterial {
             return materialForName("planet\($0).jpg")
         }
 
-        moons = (1...1).map {
+        moons = (1...2).map {
             return materialForName("moon\($0).jpg")
         }
 
         centerPlanet = materialForName("sun.jpg")
         
-        func materialForColor(_ color: UIColor) -> SCNMaterial {
-            let material = SCNMaterial()
-            
-            material.lightingModel = .physicallyBased
-            material.diffuse.contents = color
-            material.isDoubleSided = false
-            
-            return material
-        }
-        
-        moons.append(materialForColor(.gray))
+        // kinda looks like stars
+        floor = materialForName("planet7.jpg")
     }
         
     static func nextPlanetTexture() -> SCNMaterial {
