@@ -86,7 +86,6 @@ public class PlanetView: ARSCNView, ARSCNViewDelegate, UIGestureRecognizerDelega
     }
     
     public func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        scene.lightingEnvironment.intensity = 1
         if let newFrame = (PlaygroundPage.current.liveView as? UIView)?.frame, newFrame != pastFrame {
             pastFrame = newFrame
             planetView.controlView.updateView(with: newFrame)
@@ -220,7 +219,6 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
     }
     
     func setupLighting() {
-        sceneView.autoenablesDefaultLighting = false
         sceneView.automaticallyUpdatesLighting = false
         
         let lighting = UIImage(named: "spherical.jpg")
@@ -232,7 +230,6 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
     }
     
     func addNode(_ node: SCNNode, to rootNode: SCNNode) {
-        node.scale = SCNVector3(x: scale, y: scale, z: scale)
         rootNode.addChildNode(node)
     }
     
@@ -265,7 +262,7 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
         planetView.controlView.directionView.nextDirection(shouldBe: .placePlanet)
         
         let planetPosition = SCNVector3(x: position.x, y: system.centerPlanet.position.y, z: position.z)
-        let distance = system.centerPlanet.position.dis(planetPosition)
+        let distance = system.centerPlanet.position.dis(planetPosition) * CGFloat(1 / scale)
         let planetNode = PlanetNode(distance: distance, orbiting: system.centerPlanet, radius: 0.05, mass: 5e24, rotationPeriod: 30, eccentricity: distance)
         let orbitNode = createOrbit(distance: distance)
         
@@ -286,7 +283,7 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
         
         planetView.controlView.directionView.nextDirection(shouldBe: .placeMoon)
         
-        let distance: CGFloat = 0.1
+        let distance: CGFloat = 0.105
         let moonNode = PlanetNode(distance: distance, orbiting: orbitPlanet, radius: 0.005, mass: 7.34767e22, rotationPeriod: 30, eccentricity: distance, isMoon: true)
         let orbitNode = SCNNode()
         

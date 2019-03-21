@@ -14,8 +14,6 @@ public class Introduction {
     var introSKScene: IntroSKScene!
     
     public init() {
-        //         TODO: make start()
-        //        loadAR()
         start()
     }
     
@@ -92,13 +90,6 @@ public class Introduction {
         wwdcNode.scale = SCNVector3Make(5, 5, 0)
         wwdcNode.opacity = 0.0
         
-        //        let wwdcText = SCNText(string: "WWDC19", extrusionDepth: 2)
-        //        wwdcText.flatness = 0.3
-        //        wwdcNode = SCNNode(geometry: wwdcText)
-        //        wwdcNode.position = SCNVector3(x: -100, y: -20, z: 60)
-        //        wwdcNode.scale = SCNVector3Make(3, 3, 0)
-        //        wwdcNode.opacity = 0.0
-        
         Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { (timer) in
             self.wwdcNode.runAction(SCNAction.fadeIn(duration: 10))
         }
@@ -109,6 +100,7 @@ public class Introduction {
         Timer.scheduledTimer(withTimeInterval: 15, repeats: false) { (timer) in
             self.introSKScene.startLabel.show()
             self.introSKScene.startBackground.show()
+            
             self.introSKScene.isAnimationFinished = true
         }
         
@@ -130,7 +122,7 @@ public class Introduction {
             self.field = SCNPhysicsField.vortex()
             self.field.strength = 200
             self.fieldNode.physicsField = self.field
-            Timer.scheduledTimer(withTimeInterval: 6, repeats: false) { (timer) in
+            Timer.scheduledTimer(withTimeInterval: 6.8, repeats: false) { (timer) in
                 let sun = SCNSphere(radius: 60)
                 sun.firstMaterial?.diffuse.contents = UIColor.brown
                 let sunNode = SCNNode(geometry: sun)
@@ -141,11 +133,9 @@ public class Introduction {
                 
                 self.scene.rootNode.addChildNode(sunNode)
                 
-                
-                
-                let camMove = SCNAction.move(to: SCNVector3Make(0, 30, 0), duration: 2)
+                let camMove = SCNAction.move(to: SCNVector3Make(0, 30, 0), duration: 1.5)
                 camMove.timingMode = .easeIn
-                self.cameraNode.runAction(camMove)
+                self.cameraNode.runAction(SCNAction.sequence([SCNAction.wait(duration: 0.5), camMove]))
                 self.introSKScene.blackFadeOut()
                 
                 Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { (t) in
@@ -221,7 +211,7 @@ public class Introduction {
         
         func updatePositions() {
             startLabel.position = CGPoint(x: frame.midX, y: frame.midY - 38 - startBackground.frame.height / 2)
-            startBackground.position = CGPoint(x: frame.midX - startBackground.frame.width / 2, y: frame.midY - startBackground.frame.height - 35)
+            startBackground.position = CGPoint(x: frame.midX - startBackground.frame.width / 2, y: frame.midY - startBackground.frame.height / 2 - 53)
         }
         
         override func update(_ currentTime: TimeInterval) {

@@ -103,6 +103,8 @@ class ControlView {
         }
         directionView.fadeIn(duration: 0.2)
         directionView.currentDirection = .moveAround
+        directionView.directionText.text = directionView.directions[.moveAround]
+        planetView.controlView.updateView(with: planetView.frame)
     }
     
     func updateView(with newFrame: CGRect) {
@@ -125,9 +127,18 @@ class DirectionView: UIView {
     
     var directionText: UILabel!
     
-    var currentDirection: Direction = .moveAround
+    var currentDirection: Direction = .moveAround {
+        didSet {
+            if self.currentDirection != .done {
+                self.frame.size.width = 300
+                for view in self.subviews {
+                    view.frame.size.width = 300
+                }
+            } 
+        }
+    }
     
-    private var directions: [Direction: String] = [
+    var directions: [Direction: String] = [
         .moveAround: "Move around and find a flat surface",
         .placeFloor: "Tap on a floor to place a sun",
         .placePlanet: "Tap + to add a planet where you are",
@@ -397,8 +408,24 @@ class PlanetSliderView: UIView {
     
     @objc func deleteSystemClicked(_ sender: UIButton) {
         
-        planetView.planetScene.removePlanet(planet: planetView.controlView.planetNode)
-        planetView.controlView.planetNode = nil
+        if planetView.controlView.isSun {
+            for node in planetView.planetScene.rootNode.childNodes {
+                if node.geometry is SCNSphere || node.geometry is SCNTorus || node.geometry is SCNPlane {
+                    node.removeFromParentNode()
+                }
+            }
+            
+            planetView.unselect()
+            planetView.controlView.deleteSystem()
+            planetView.floorNode = nil
+            planetView.highlightedNode = nil
+            planetView.planetNode = nil
+            planetView.planetScene.scale = 1
+            planetView.planetScene.planetSystem = nil
+        } else {
+            planetView.planetScene.removePlanet(planet: planetView.controlView.planetNode)
+            planetView.controlView.planetNode = nil
+        }
         
     }
     
@@ -441,13 +468,14 @@ class PlanetSliderView: UIView {
         if let _ = (planetNode?.orbitNode?.geometry as? SCNTorus)?.ringRadius {
             var orb = (planetNode?.planet as! OrbitingPlanet)
             let newSphere = SCNTorus(ringRadius: orb.eccentricity * CGFloat(value), pipeRadius: 0.0005)
+            
             orb.distance = orb.eccentricity * CGFloat(value)
             planetNode?.planet = orb
             newSphere.materials = (planetNode?.orbitNode?.geometry?.materials)!
             planetNode?.orbitNode?.geometry = newSphere
             
-            let x = Float(orb.distance) * -cos(planetNode!.rotation.y)
-            let z = Float(orb.distance) * -sin(planetNode!.rotation.y)
+            let x = Float(orb.distance) * -cos(planetNode!.orbitNode!.rotation.y)
+            let z = Float(orb.distance) * -sin(planetNode!.orbitNode!.rotation.y)
             
             planetNode?.position = SCNVector3(x: x, y: 0, z: z)
         }
@@ -538,6 +566,7 @@ class SystemSliderView: UIView {
             }
         }
         
+        planetView.unselect()
         planetView.controlView.deleteSystem()
         planetView.floorNode = nil
         planetView.highlightedNode = nil
