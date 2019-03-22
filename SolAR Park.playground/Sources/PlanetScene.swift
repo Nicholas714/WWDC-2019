@@ -87,7 +87,7 @@ public class PlanetView: ARSCNView, ARSCNViewDelegate, UIGestureRecognizerDelega
     
     public func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         if let newFrame = (PlaygroundPage.current.liveView as? UIView)?.frame, newFrame != pastFrame {
-            pastFrame = newFrame
+            self.pastFrame = newFrame
             planetView.controlView.updateView(with: newFrame)
         }
     }
@@ -258,6 +258,11 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
             return
         }
         
+        // prevents more than 30 planets/moons from being placed
+        if let system = planetSystem, system.planets.count > 30 {
+            return
+        }
+        
         // created planet
         planetView.controlView.directionView.nextDirection(shouldBe: .placePlanet)
         
@@ -281,17 +286,27 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
             return
         }
         
+        // prevents more than 30 planets/moons from being placed
+        if let system = planetSystem, system.planets.count > 30 {
+            return
+        }
+        
         planetView.controlView.directionView.nextDirection(shouldBe: .placeMoon)
         
         let distance: CGFloat = 0.105
         let moonNode = PlanetNode(distance: distance, orbiting: orbitPlanet, radius: 0.005, mass: 7.34767e22, rotationPeriod: 30, eccentricity: distance, isMoon: true)
-        let orbitNode = SCNNode()
+        let orbitNode = createOrbit(distance: distance)
         
         addNode(orbitNode, to: planetNode)
-        moonNode.position = SCNVector3(x: 0, y: 0, z: 0.1)
+        let randomAngle = Float(arc4random())
+        let x = Float(distance) * cos(randomAngle)
+        let z = Float(distance) * sin(randomAngle)
+        moonNode.position = SCNVector3(x: x, y: 0, z: z)
         orbitNode.addChildNode(moonNode)
         
+        moonNode.orbitNode = orbitNode
         planetNode.applyActions()
+        moonNode.applyActions()
         planetSystem?.planets.append(moonNode)
     }
     

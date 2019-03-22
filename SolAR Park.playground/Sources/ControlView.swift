@@ -144,7 +144,7 @@ class DirectionView: UIView {
         .placePlanet: "Tap + to add a planet where you are",
         .useControls: "Tap a planet and change the sliders",
         .placeMoon: "Tap a planet, then + to add a moon",
-        .done: "WWDC19"
+        .done: "WWDC19"
     ]
     
     init() {
@@ -474,8 +474,8 @@ class PlanetSliderView: UIView {
             newSphere.materials = (planetNode?.orbitNode?.geometry?.materials)!
             planetNode?.orbitNode?.geometry = newSphere
             
-            let x = Float(orb.distance) * -cos(planetNode!.orbitNode!.rotation.y)
-            let z = Float(orb.distance) * -sin(planetNode!.orbitNode!.rotation.y)
+            let x = Float(orb.distance) * -cos(planetNode!.orbitNode!.presentation.rotation.y)
+            let z = Float(orb.distance) * -sin(planetNode!.orbitNode!.presentation.rotation.y)
             
             planetNode?.position = SCNVector3(x: x, y: 0, z: z)
         }

@@ -81,17 +81,17 @@ public class Introduction {
         fieldNode = SCNNode()
         fieldNode.physicsField = field
         
-        let wwdcText = SCNText(string: "", extrusionDepth: 2)
+        let wwdcText = SCNText(string: "WWDC19", extrusionDepth: 2)
         wwdcText.firstMaterial?.emission.contents = UIColor.white
         
         wwdcText.flatness = 0.3
         wwdcNode = SCNNode(geometry: wwdcText)
-        wwdcNode.position = SCNVector3(x: -27, y: -35, z: 100)
-        wwdcNode.scale = SCNVector3Make(5, 5, 0)
+        wwdcNode.position = SCNVector3(x: -80, y: -20, z: 60)
+        wwdcNode.scale = SCNVector3Make(3, 3, 0)
         wwdcNode.opacity = 0.0
         
         Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { (timer) in
-            self.wwdcNode.runAction(SCNAction.fadeIn(duration: 10))
+            self.wwdcNode.runAction(SCNAction.sequence([SCNAction.wait(duration: 5), SCNAction.fadeIn(duration: 9)]))
         }
         
         introSKScene = IntroSKScene(intro: self)
