@@ -4,10 +4,11 @@ public class PlanetNode: SCNNode {
     
     var planet: Planet
     var orbitNode: SCNNode?
+    var isMoon = false
     
     init(distance: CGFloat, orbiting: PlanetNode, radius: CGFloat, mass: CGFloat, rotationPeriod: CGFloat, eccentricity: CGFloat, isMoon: Bool = false) {
         planet = OrbitingPlanet(target: orbiting, mass: mass, radius: radius, distance: distance, rotationPeriod: rotationPeriod, eccentricity: eccentricity)
-        
+        self.isMoon = isMoon
         super.init()
         
         if isMoon {

@@ -465,9 +465,9 @@ class PlanetSliderView: UIView {
         
         let planetNode = planetView.controlView.planetNode
         
-        if let _ = (planetNode?.orbitNode?.geometry as? SCNTorus)?.ringRadius {
+        if let pipe = (planetNode?.orbitNode?.geometry as? SCNTorus)?.pipeRadius {
             var orb = (planetNode?.planet as! OrbitingPlanet)
-            let newSphere = SCNTorus(ringRadius: orb.eccentricity * CGFloat(value), pipeRadius: 0.0005)
+            let newSphere = SCNTorus(ringRadius: orb.eccentricity * CGFloat(value), pipeRadius: pipe)
             
             orb.distance = orb.eccentricity * CGFloat(value)
             planetNode?.planet = orb
@@ -646,7 +646,9 @@ class ActionView: UIView {
     @objc func addClicked() {
         switch planetView.state {
         case .planet(let node):
-            planetView.planetScene.createMoon(planetNode: node)
+            if !planetView.controlView.planetNode!.isMoon {
+                planetView.planetScene.createMoon(planetNode: node)
+            }
         case .sun:
             fallthrough
         case .none:

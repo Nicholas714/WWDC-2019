@@ -295,7 +295,7 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
         
         let distance: CGFloat = 0.105
         let moonNode = PlanetNode(distance: distance, orbiting: orbitPlanet, radius: 0.005, mass: 7.34767e22, rotationPeriod: 30, eccentricity: distance, isMoon: true)
-        let orbitNode = createOrbit(distance: distance)
+        let orbitNode = createOrbit(distance: distance, rad: 0.00005)
         
         addNode(orbitNode, to: planetNode)
         let randomAngle = Float(arc4random())
@@ -310,8 +310,8 @@ public class PlanetScene: SCNScene, UIGestureRecognizerDelegate {
         planetSystem?.planets.append(moonNode)
     }
     
-    func createOrbit(distance: CGFloat) -> SCNNode {
-        let torus = SCNTorus(ringRadius: distance, pipeRadius: 0.0005)
+    func createOrbit(distance: CGFloat, rad: CGFloat = 0.0005) -> SCNNode {
+        let torus = SCNTorus(ringRadius: distance, pipeRadius: rad)
         torus.pipeSegmentCount = 72
         torus.ringSegmentCount = 144
         let torusNode = SCNNode(geometry: torus)
